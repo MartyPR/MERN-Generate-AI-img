@@ -1,10 +1,16 @@
 //
 import express from "express";
 import OpenAI from "openai";
-
+import cors from "cors";
 import dotenv from "dotenv";
 import { config, uploader } from "cloudinary";
 import mongoose from    "mongoose";
+ 
+
+const corsOption= {
+    origin:'http://localhost:5173',
+    credentials:true
+}
 
 dotenv.config();
 const app = express();
@@ -34,6 +40,7 @@ config({
 });
 //middlewares
 app.use(express.json());
+app.use(cors(corsOption))
 
 //route
 app.post("/generate-image", async (req, res) => {
@@ -63,6 +70,15 @@ app.post("/generate-image", async (req, res) => {
     res.status(400).json({ message: "Error generation image" });
   }
 });
+
+app.get('/images', async(req,res)=>{
+try {
+    const images= await Gallery.find();
+    res.json(images);
+} catch (error) {
+    res.json({message:"Error fetching images"})
+}
+})
 
 //start server
 app.listen(PORT, console.log("Server is running..."));
